@@ -71,6 +71,8 @@ const defaultHostName = "hubs.local";
 const host = process.env.HOST_IP || defaultHostName;
 const port = process.env.HOST_PORT || 9090;
 
+const babelConf = JSON.parse(fs.readFileSync("./.babelrc", "utf-8"));
+
 module.exports = env => {
   return {
     entry: {
@@ -100,6 +102,10 @@ module.exports = env => {
     output: {
       filename: "assets/js/[name]-[chunkhash].js",
       publicPath: process.env.BASE_ASSETS_PATH || "/"
+    },
+
+    resolve: {
+      symlinks: false
     },
 
     module: {
@@ -178,8 +184,13 @@ module.exports = env => {
         },
         {
           test: /\.js$/,
-          include: path.join(__dirname, "src"),
-          use: "babel-loader"
+          include: [path.join(__dirname, "src"), path.join(__dirname, "strata")],
+          use: [
+            {
+              loader: "babel-loader",
+              options: babelConf
+            }
+          ]
         },
         {
           test: /\.worker\.js$/,

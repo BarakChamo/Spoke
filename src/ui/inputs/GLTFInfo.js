@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 import { PieChart, Pie, Legend, Label, Cell } from "recharts";
 import styled, { ThemeContext } from "styled-components";
 import { PropertiesPanelButton } from "./Button";
-import { validateString } from "@robertlong/gltf-validator";
 import { EditorContext } from "../contexts/EditorContext";
 import Collapsible from "./Collapsible";
 import { bytesToSize } from "../utils";
+
+const { validateString } = require("gltf-validator");
 
 const ChartContainer = styled.div`
   margin: 4px 0;
