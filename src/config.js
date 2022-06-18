@@ -103,6 +103,9 @@ export function createEditor(api, settings) {
   editor.registerNode(TroikaTextNode, TroikaTextNodeEditor);
   editor.registerNode(MirrorNode, MirrorNodeEditor);
 
+  registerCustomNodes(editor);
+  registerCustomSources(editor);
+
   editor.registerSource(new ElementsSource(editor));
   editor.registerSource(new MyAssetsSource(editor));
   editor.registerSource(new ArchitectureKitSource(api));
@@ -112,9 +115,6 @@ export function createEditor(api, settings) {
   editor.registerSource(new BingVideosSource(api));
   editor.registerSource(new HubsSoundPackSource(editor));
   editor.registerSource(new TenorSource(api));
-
-  registerCustomNodes(editor);
-  registerCustomSources(editor);
 
   return editor;
 }
