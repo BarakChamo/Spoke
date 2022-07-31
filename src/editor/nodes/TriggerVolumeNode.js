@@ -14,7 +14,7 @@ const requiredProperties = [
 export default class TriggerVolumeNode extends EditorNodeMixin(Object3D) {
   static componentName = "trigger-volume";
 
-  static experimental = true;
+  //static experimental = true;
 
   static nodeName = "Trigger Volume";
 
