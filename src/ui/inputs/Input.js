@@ -1,12 +1,12 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 function borderColor(props, defaultColor) {
   if (props.canDrop) {
-    return props.theme.blue;
+    return props.theme.blue
   } else if (props.error) {
-    return props.theme.error;
+    return props.theme.error
   } else {
-    return defaultColor;
+    return defaultColor
   }
 }
 
@@ -30,6 +30,6 @@ const Input = styled.input`
     background-color: ${props => props.theme.disabled};
     color: ${props => props.theme.disabledText};
   }
-`;
+`
 
-export default Input;
+export default Input
