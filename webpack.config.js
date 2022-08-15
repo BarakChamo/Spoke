@@ -1,107 +1,107 @@
 // Variables in .env and .env.defaults will be added to process.env
-const dotenv = require("dotenv");
+const dotenv = require('dotenv')
 
-if (process.env.NODE_ENV === "production") {
-  dotenv.config({ path: ".env.prod" });
-} else if (process.env.NODE_ENV === "test") {
-  dotenv.config({ path: ".env.test" });
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.prod' })
+} else if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test' })
 } else {
-  dotenv.config({ path: ".env" });
-  dotenv.config({ path: ".env.defaults" });
+  dotenv.config({ path: '.env' })
+  dotenv.config({ path: '.env.defaults' })
 }
 
-const fs = require("fs");
-const selfsigned = require("selfsigned");
-const cors = require("cors");
-const HTMLWebpackPlugin = require("html-webpack-plugin");
-const path = require("path");
-const webpack = require("webpack");
-const TerserJSPlugin = require("terser-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const fs = require('fs')
+const selfsigned = require('selfsigned')
+const cors = require('cors')
+const HTMLWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
+const webpack = require('webpack')
+const TerserJSPlugin = require('terser-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 function createHTTPSConfig() {
   // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+  if (fs.existsSync(path.join(__dirname, 'certs'))) {
+    const key = fs.readFileSync(path.join(__dirname, 'certs', 'key.pem'))
+    const cert = fs.readFileSync(path.join(__dirname, 'certs', 'cert.pem'))
 
-    return { key, cert };
+    return { key, cert }
   } else {
     const pems = selfsigned.generate(
       [
         {
-          name: "commonName",
-          value: "localhost"
+          name: 'commonName',
+          value: 'localhost'
         }
       ],
       {
         days: 365,
-        algorithm: "sha256",
+        algorithm: 'sha256',
         extensions: [
           {
-            name: "subjectAltName",
+            name: 'subjectAltName',
             altNames: [
               {
                 type: 2,
-                value: "localhost"
+                value: 'localhost'
               },
               {
                 type: 2,
-                value: "hubs.local"
+                value: 'hubs.local'
               }
             ]
           }
         ]
       }
-    );
+    )
 
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+    fs.mkdirSync(path.join(__dirname, 'certs'))
+    fs.writeFileSync(path.join(__dirname, 'certs', 'cert.pem'), pems.cert)
+    fs.writeFileSync(path.join(__dirname, 'certs', 'key.pem'), pems.private)
 
     return {
       key: pems.private,
       cert: pems.cert
-    };
+    }
   }
 }
 
-const defaultHostName = "hubs.local";
-const host = process.env.HOST_IP || defaultHostName;
-const port = process.env.HOST_PORT || 9090;
+const defaultHostName = 'hubs.local'
+const host = process.env.HOST_IP || defaultHostName
+const port = process.env.HOST_PORT || 9090
 
-const babelConf = JSON.parse(fs.readFileSync("./.babelrc", "utf-8"));
+const babelConf = JSON.parse(fs.readFileSync('./.babelrc', 'utf-8'))
 
 module.exports = env => {
   return {
     entry: {
-      entry: ["./src/index.js"]
+      entry: ['./src/index.js']
     },
 
-    devtool: process.env.NODE_ENV === "production" ? "source-map" : "inline-source-map",
+    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
 
     devServer: {
       https: createHTTPSConfig(),
       historyApiFallback: true,
       port,
-      host: process.env.HOST_IP || "0.0.0.0",
+      host: process.env.HOST_IP || '0.0.0.0',
       public: `${host}:${port}`,
-      publicPath: process.env.BASE_ASSETS_PATH || "",
+      publicPath: process.env.BASE_ASSETS_PATH || '',
       useLocalIp: true,
       allowedHosts: [host],
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        'Access-Control-Allow-Origin': '*'
       },
       before: function(app) {
         // be flexible with people accessing via a local reticulum on another port
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }))
       }
     },
 
     output: {
-      filename: "assets/js/[name]-[chunkhash].js",
-      publicPath: process.env.BASE_ASSETS_PATH || "/"
+      filename: 'assets/js/[name]-[chunkhash].js',
+      publicPath: process.env.BASE_ASSETS_PATH || '/'
     },
 
     resolve: {
@@ -113,40 +113,40 @@ module.exports = env => {
         {
           test: /\.(png|jpg|jpeg|gif|svg)(\?.*$|$)/,
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/images"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/images'
             }
           }
         },
         {
           test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/fonts"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/fonts'
             }
           }
         },
         {
           test: /\.(glb)(\?.*$|$)/,
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/models"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/models'
             }
           }
         },
         {
           test: /\.(gltf)(\?.*$|$)/,
           use: {
-            loader: "gltf-webpack-loader",
+            loader: 'gltf-webpack-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/models"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/models'
             }
           }
         },
@@ -154,10 +154,10 @@ module.exports = env => {
           test: /\.(bin)$/,
           use: [
             {
-              loader: "file-loader",
+              loader: 'file-loader',
               options: {
-                name: "[name]-[hash].[ext]",
-                outputPath: "assets/models"
+                name: '[name]-[hash].[ext]',
+                outputPath: 'assets/models'
               }
             }
           ]
@@ -165,120 +165,141 @@ module.exports = env => {
         {
           test: /\.(mp4|webm)(\?.*$|$)/,
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/videos"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/videos'
             }
           }
         },
         {
           test: /\.(spoke)(\?.*$|$)/,
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name]-[hash].[ext]",
-              outputPath: "assets/templates"
+              name: '[name]-[hash].[ext]',
+              outputPath: 'assets/templates'
             }
           }
         },
         {
           test: /\.js$/,
-          include: [path.join(__dirname, "src"), path.join(__dirname, "strata")],
+          include: [path.join(__dirname, 'src'), path.join(__dirname, 'strata')],
           use: [
             {
-              loader: "babel-loader",
+              loader: 'babel-loader',
               options: babelConf
             }
           ]
         },
         {
           test: /\.worker\.js$/,
-          include: path.join(__dirname, "src"),
-          loader: "worker-loader",
+          include: path.join(__dirname, 'src'),
+          loader: 'worker-loader',
           options: {
             // Workers must be inlined because they are hosted on a CDN and CORS doesn't permit us
             // from loading worker scripts from another origin. To minimize bundle size, dynamically
             // import a wrapper around the worker. See SketchfabZipLoader.js and API.js for an example.
-            name: "assets/js/workers/[name]-[hash].js",
+            name: 'assets/js/workers/[name]-[hash].js',
             inline: true,
             fallback: false
           }
         },
         {
           test: /\.wasm$/,
-          type: "javascript/auto",
+          type: 'javascript/auto',
           use: {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              outputPath: "assets/js/wasm",
-              name: "[name]-[hash].[ext]"
+              outputPath: 'assets/js/wasm',
+              name: '[name]-[hash].[ext]'
             }
           }
+        },
+        {
+          test: /\.(glsl|vs|fs|vert|frag)$/,
+          include: [path.join(__dirname, 'src'), path.join(__dirname, 'strata')],
+          exclude: /node_modules/,
+          use: [
+            'raw-loader',
+            // {
+            //   loader: 'file-loader',
+            //   options: {
+            //     name: '[name]-[hash].[ext]',
+            //     outputPath: 'assets/shaders'
+            //   }
+            // },
+            {
+              loader: 'glslify-loader',
+              options: {
+                transform: [['glslify-hex', 'glslify-import']]
+              }
+            }
+          ]
         }
       ]
     },
 
-    target: "web",
+    target: 'web',
     node: {
       __dirname: false,
-      fs: "empty",
+      fs: 'empty',
       Buffer: false,
       process: false
     },
 
     optimization: {
-      minimizer: [new TerserJSPlugin({ sourceMap: true, parallel: true, cache: path.join(__dirname, ".tersercache") })]
+      minimizer: [new TerserJSPlugin({ sourceMap: true, parallel: true, cache: path.join(__dirname, '.tersercache') })]
     },
 
     plugins: [
       new BundleAnalyzerPlugin({
-        analyzerMode: env && env.BUNDLE_ANALYZER ? "server" : "disabled"
+        analyzerMode: env && env.BUNDLE_ANALYZER ? 'server' : 'disabled'
       }),
       new CopyWebpackPlugin([
         {
           from: path.join(
             __dirname,
-            "src",
-            "assets",
-            process.env.IS_MOZ === "true" ? "favicon-spoke.ico" : "favicon-editor.ico"
+            'src',
+            'assets',
+            process.env.IS_MOZ === 'true' ? 'favicon-spoke.ico' : 'favicon-editor.ico'
           ),
-          to: "assets/images/favicon.ico"
+          to: 'assets/images/favicon.ico'
         }
       ]),
       new CopyWebpackPlugin([
         {
-          from: path.join(__dirname, "src", "assets", "favicon-spoke.ico"),
-          to: "assets/images/favicon-spoke.ico"
+          from: path.join(__dirname, 'src', 'assets', 'favicon-spoke.ico'),
+          to: 'assets/images/favicon-spoke.ico'
         }
       ]),
       new CopyWebpackPlugin([
         {
-          from: path.join(__dirname, "src", "assets", "favicon-editor.ico"),
-          to: "assets/images/favicon-editor.ico"
+          from: path.join(__dirname, 'src', 'assets', 'favicon-editor.ico'),
+          to: 'assets/images/favicon-editor.ico'
         }
       ]),
       new HTMLWebpackPlugin({
-        template: path.join(__dirname, "src", "index.html"),
-        faviconPath: (process.env.BASE_ASSETS_PATH || "/") + "assets/images/favicon.ico"
+        template: path.join(__dirname, 'src', 'index.html'),
+        faviconPath: (process.env.BASE_ASSETS_PATH || '/') + 'assets/images/favicon.ico'
       }),
       new webpack.EnvironmentPlugin({
-        BUILD_VERSION: "dev",
-        NODE_ENV: "development",
+        BUILD_VERSION: 'dev',
+        NODE_ENV: 'development',
         RETICULUM_SERVER: undefined,
-        THUMBNAIL_SERVER: "",
+        THUMBNAIL_SERVER: '',
         HUBS_SERVER: undefined,
         CORS_PROXY_SERVER: null,
-        BASE_ASSETS_PATH: "",
-        NON_CORS_PROXY_DOMAINS: "",
-        ROUTER_BASE_PATH: "",
+        BASE_ASSETS_PATH: '',
+        NON_CORS_PROXY_DOMAINS: '',
+        ROUTER_BASE_PATH: '',
         SENTRY_DSN: null,
         GA_TRACKING_ID: null,
         IS_MOZ: false,
-        GITHUB_ORG: "mozilla",
-        GITHUB_REPO: "spoke",
-        GITHUB_PUBLIC_TOKEN: "ghp_SAFEPB2zzes9TEpAOSx2McNjJLQ1GXLBES2FsfWU"
+        GITHUB_ORG: 'mozilla',
+        GITHUB_REPO: 'spoke',
+        GITHUB_PUBLIC_TOKEN: 'ghp_SAFEPB2zzes9TEpAOSx2McNjJLQ1GXLBES2FsfWU'
       })
     ]
-  };
-};
+  }
+}
