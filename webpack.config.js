@@ -221,6 +221,7 @@ module.exports = env => {
           include: [path.join(__dirname, 'src'), path.join(__dirname, 'strata')],
           exclude: /node_modules/,
           use: [
+            // 'glslify-import-loader',
             'raw-loader',
             // {
             //   loader: 'file-loader',
@@ -232,7 +233,7 @@ module.exports = env => {
             {
               loader: 'glslify-loader',
               options: {
-                transform: [['glslify-hex', 'glslify-import']]
+                transform: ['glslify-hex', 'glslify-import']
               }
             }
           ]
